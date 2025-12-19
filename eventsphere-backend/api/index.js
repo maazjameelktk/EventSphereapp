@@ -1030,3 +1030,44 @@ app.use((error, req, res, next) => {
 });
 
  module.exports = app;
+// ============ LOCAL DEVELOPMENT SUPPORT ============
+// This allows the file to run as a standalone server
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  
+  // Start server after MongoDB connects
+  const startServer = () => {
+    app.listen(PORT, () => {
+      console.log(`
+╔═══════════════════════════════════════════════════╗
+║     🚀 EventSphere Backend Server Started!       ║
+╠═══════════════════════════════════════════════════╣
+║ 📍 Port:          ${PORT}                         ║
+║ 🔗 Local URL:     http://localhost:${PORT}       ║
+║ 📊 Health Check:  http://localhost:${PORT}/api/health ║
+║ 📁 Database:      ${mongoose.connection.name}     ║
+║ 🛠️  Environment:  ${process.env.NODE_ENV || 'development'} ║
+╚═══════════════════════════════════════════════════╝
+      `);
+      console.log(`\n📚 Available Endpoints:`);
+      console.log(`   GET  /api/health           - Health check`);
+      console.log(`   POST /api/auth/register    - Register user`);
+      console.log(`   POST /api/auth/login       - Login`);
+      console.log(`   GET  /api/events           - Get all events`);
+      console.log(`   POST /api/tickets/book     - Book ticket`);
+      console.log(`\n💡 Tip: Open http://localhost:${PORT}/api/health in browser`);
+    });
+  };
+  
+  // Check if MongoDB is already connected
+  if (mongoose.connection.readyState === 1) {
+    startServer();
+  } else {
+    mongoose.connection.once('open', startServer);
+  }
+  
+  // Handle MongoDB connection errors
+  mongoose.connection.on('error', (err) => {
+    console.error('❌ MongoDB connection error:', err.message);
+  });
+}
