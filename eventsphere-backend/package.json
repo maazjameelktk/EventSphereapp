@@ -5,13 +5,15 @@
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
-    "dev": "nodemon api/index.js"
+    "dev": "nodemon api/index.js",
+    "test": "echo \"No tests specified\" && exit 0"
   },
-  "keywords": [],
+  "keywords": ["events", "ticketing", "backend", "api"],
   "author": "",
   "license": "ISC",
   "engines": {
-    "node": "24.x"
+    "node": ">=18.0.0 <=24.x",
+    "npm": ">=8.0.0"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

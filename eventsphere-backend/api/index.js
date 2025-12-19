@@ -8,12 +8,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ YOUR MONGODB ATLAS CONNECTION STRING
-const MONGODB_URI = 'mongodb+srv://maazkhattak155_db_user:Maaz12345@cluster0.a59mn8k.mongodb.net/eventsphere?retryWrites=true&w=majority';
-const JWT_SECRET = 'eventsphere-secret-key-2024-maaz-khattak';
+// ✅ ENVIRONMENT VARIABLES (NO HARDCODED SECRETS)
+const MONGODB_URI = process.env.MONGODB_URI;
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// Connect to MongoDB Atlas
-mongoose.connect(MONGODB_URI)
+// Connect to MongoDB Atlas with optimized settings
+mongoose.connect(MONGODB_URI, {
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+})
   .then(() => {
     console.log('✅ MongoDB Atlas Connected Successfully!');
     console.log('📊 Database: eventsphere');
@@ -658,7 +661,6 @@ app.get('/api/tickets/:ticketNumber', authenticateToken, async (req, res) => {
     }
     
     // Check if user owns this ticket or is admin
-    // FIX: Handle case where userId might not be populated properly
     const ticketUserId = ticket.userId ? 
       (ticket.userId._id ? ticket.userId._id.toString() : ticket.userId.toString()) : 
       null;
@@ -1029,7 +1031,8 @@ app.use((error, req, res, next) => {
   });
 });
 
- module.exports = app;
+
+
 // ============ LOCAL DEVELOPMENT SUPPORT ============
 // This allows the file to run as a standalone server
 if (require.main === module) {
@@ -1070,4 +1073,6 @@ if (require.main === module) {
   mongoose.connection.on('error', (err) => {
     console.error('❌ MongoDB connection error:', err.message);
   });
+  
 }
+module.exports = app;
